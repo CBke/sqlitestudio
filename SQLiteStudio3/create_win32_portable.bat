@@ -1,7 +1,7 @@
 @echo off
 
 set QT_DIR=c:\Qt\5.4\mingw491_32\bin
-set ZIP="c:\Program Files\7-Zip\7z.exe"
+set ZIP="c:\Program Files (x86)\7-Zip\7z.exe"
 
 set QMAKE=%QT_DIR%\qmake.exe
 set OLDDIR=%CD%
