@@ -53,6 +53,10 @@ CFG_CATEGORIES(SqlEnterpriseFormatterConfig,
         CFG_ENTRY(QString,     PrefferedWrapper,          getNameWrapperStr(NameWrapper::BRACKET))
         CFG_ENTRY(QStringList, Wrappers,                  getNameWrapperStrings(),                  false)
         CFG_ENTRY(QString,     PreviewCode,               QString(),                                false)
+        CFG_ENTRY(bool,        MoveAllCommentsToLineEnd,  false)
+        CFG_ENTRY(bool,        LineUpCommentsAtLineEnd,   true)
+        CFG_ENTRY(QString,     PreferredCommentMarker,    "--")
+        CFG_ENTRY(QStringList, CommentMarkers,            QStringList({"--", "/* */"}))
     )
 )
 
@@ -73,6 +77,25 @@ class SQLENTERPRISEFORMATTERSHARED_EXPORT SqlEnterpriseFormatter : public Generi
         void configDialogClosed();
 
     private:
+        struct Comment
+        {
+            int position = 0;
+            QString contents;
+            bool tokensBefore = false;
+            bool tokensAfter = false;
+            bool multiline = false;
+        };
+
+        QList<Comment*> collectComments(const TokenList& tokens);
+        QString applyComments(const QString& formatted, QList<Comment *> comments, Dialect dialect);
+        QList<TokenList> tokensByLines(const TokenList& tokens, bool includeSpaces = false);
+        TokenList adjustCommentsToEnd(const TokenList& inputTokens);
+        TokenList wrapOnlyComments(const TokenList& inputTokens);
+        TokenList optimizeInnerComments(const TokenList& inputTokens);
+        TokenList optimizeEndLineComments(const TokenList& inputTokens);
+        void indentMultiLineComments(const TokenList& inputTokens);
+        void wrapComment(const TokenPtr& token, bool isAtLineEnd);
+
         QList<SqliteQueryPtr> previewQueries;
         CFG_LOCAL_PERSISTABLE(SqlEnterpriseFormatterConfig, cfg)
 
